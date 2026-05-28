@@ -13,7 +13,19 @@ const scanEmails = async (req, res) => {
 
     for (const email of emails) {
       const content = await getEmailContent(email.id);
-      if (isJobEmail(content.subject, content.body)) {
+      let isJob = isJobEmail(content.subject, content.body);
+
+      // Upgrade heuristics using the BART classifier if API key is active
+      if (isJob) {
+        try {
+          const classification = await classifyJobEmail(content.subject + ' ' + content.body);
+          isJob = classification.label === 'job opportunity' && classification.score >= 0.6;
+        } catch (error) {
+          console.warn('Hugging Face BART classification bypassed, falling back to heuristics:', error.message);
+        }
+      }
+
+      if (isJob) {
         const details = extractJobDetails(content.subject, content.body);
         const job = await Job.create({ userId: req.user.id, ...details, source: 'email', emailId: email.id });
         await markAsRead(email.id);

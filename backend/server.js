@@ -11,6 +11,9 @@ const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const resumeRoutes = require('./routes/resumeRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const interviewRoutes = require('./routes/interviewRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const researchRoutes = require('./routes/researchRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -31,6 +34,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/interviews', interviewRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/research', researchRoutes);
 
 // Health check
 app.get('/', (req, res) => res.json({ message: 'AutoHire.AI API is running' }));

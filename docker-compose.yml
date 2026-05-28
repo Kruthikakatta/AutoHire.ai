@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo:6.0
+    container_name: autohire-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - autohire-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: autohire-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://db:27017/autohire-ai
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - autohire-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: autohire-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+    networks:
+      - autohire-network
+
+volumes:
+  mongo-data:
+
+networks:
+  autohire-network:
+    driver: bridge
